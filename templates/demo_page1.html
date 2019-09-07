@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>God bless you</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/Christianity.ico') }}">
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='main.css')}}>
+</head>
+<body>
+    <div class='left'>
+        <img src="{{ url_for('static',filename='images/十字架玫瑰.jpg')}}" alt="cross">
+        <span id="title">
+            {% if name %}
+                <h1>Hello "{{ name }}"!</h1>
+            {% else %}
+                <h1>Hello, World!</h1>
+                <h2>The site is being Built. </h2>
+            {% endif %}
+        </span>
+{#        <a href="http://www.baidu.com">无良网站</a>#}
+{#        <form method=post enctype="text/plain" action="upload_file">#}
+        <form method=post enctype="text/plain" action="{{ url_for('app.upload_file')}}">
+            <label for="body">填写公司名</label>
+{#            <input type="file" name="file" required>#}
+{#            <input type="text" name="company" id="upload" required>#}
+            <textarea rows="3" cols="20" required name="body" id="body">测试中，换行符隔开公司名{{ request.form['body'] }}</textarea>
+            <input type="submit" value="Upload">
+        </form>
+        <form method=post enctype=multipart/form-data action="{{ url_for('app.upload_file')}}">
+            <label for="upload">上传文件</label>
+{#            <input type="file" name="file" required>#}
+            <input type="file" name="file" id="upload" required>
+            <input type="submit" value="Upload">
+        </form>
+        <form method=get action="{{ url_for('app.download_file')}}">
+            <label for="">调取基本信息</label>
+            <input type="submit" value="download" id="基本信息">
+        </form>
+        <section class="content">
+            {% for message in get_flashed_messages() %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        </section>
+    </div>
+    <div id="right" class="table-scroll">
+        <table>
+            <tbody>
+                <th>文件中的公司名单</th>
+                {% for i in companies %}
+                    <tr><td>{{ i }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
