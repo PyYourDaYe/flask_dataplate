@@ -116,15 +116,30 @@ class GetCorrespondingFile:
 
     # 给公司做分类
     @staticmethod
-    def company_sort(companys):
-
-        companylist_all = pd.DataFrame(companys, columns=['企业名称'])
+    def company_sort(sheet):
+        companylist_all = pd.DataFrame(sheet)  #
+        if '企业名称' in companylist_all.iloc[0, :].tolist():
+            companylist_all.columns = companylist_all.loc[0, :]
+            companylist_all.drop(0, inplace=True)
+        else:
+            companylist_all.rename(columns={0: '企业名称'}, inplace=True)
         companylist_all.drop_duplicates(inplace=True)
+        companylist_all.reset_index(drop=True, inplace=True)
         # 清洗中英文括号及换行符
         companylist_all = companylist_all.replace(['\r\n', '\(', '\)', '\s'], ['', '（', '）', ''], regex=True)
 
-        companylist_all.insert(1, '分好的企业类型', None)
-        companylist_all.insert(2, '立案状态', None)
+        # 扩充总公司列
+        # 插入列['总公司']，与['企业名称']相同，索引从0开始；
+        companylist_all.insert(1, '总公司', companylist_all['企业名称'])
+        # 通过公司名，将包含分公司的部分分开
+        companylist_all['总公司'] = companylist_all['总公司'].str.replace('公司', '公司#')
+        # 设置为切割2次，生成新的df，一家总公司都没有的，会添加一列空列
+        try:
+            companylist_all['总公司'] = companylist_all['总公司'].str.split('#', 2, expand=True)[0]  # tmp —— [0总公司, 1切分, 2切分 ]
+        except Exception as e:
+            print(e)
+        companylist_all.insert(2, '分好的企业类型', None)
+        companylist_all.insert(3, '立案状态', None)
 
         # 处理公司的分类信息
         '''
@@ -135,8 +150,9 @@ class GetCorrespondingFile:
         class_list = list(df['企业类别'])
         category = dict(zip(key_list, class_list))  # 将关键词与企业类别一一对应
         # 先初步分类
+        print(companylist_all.head())
         for k, v in category.items():
-            companylist_all.loc[companylist_all['企业名称'].str.contains(k), '分好的企业类型'] = v  # 使用series函数 以及 df的过滤
+            companylist_all.loc[companylist_all['企业名称'].astype(str).str.contains(k), '分好的企业类型'] = v  # 使用series函数 以及 df的过滤
         # companylist_all.loc[companylist_all['企业名称'].str.contains(k),'细分行业']= k
         #  ['企业名称'，'总公司','分好的企业类型']
 
@@ -161,7 +177,7 @@ class GetCorrespondingFile:
             raise e
         finally:
             db.close()  # 关闭连接
-        companylist_all.loc[companylist_all['企业名称'].isin(simu), '分好的企业类型'] = '私募股权投资基金'
+        companylist_all.loc[(companylist_all['企业名称'].isin(simu)) | (companylist_all['总公司'].isin(simu)), '分好的企业类型'] = '私募股权投资基金'
 
         # 处理网贷类别数据
         '''
@@ -182,23 +198,18 @@ class GetCorrespondingFile:
             raise e
         finally:
             db.close()  # 关闭连接
-        companylist_all.loc[companylist_all['企业名称'].isin(wd), '分好的企业类型'] = '网络借贷平台'
+        companylist_all.loc[companylist_all['企业名称'].isin(wd) | companylist_all['总公司'].isin(wd), '分好的企业类型'] = '网络借贷平台'
         # 将其他没有匹配到的类别填充为‘其他’
         companylist_all['分好的企业类型'].fillna('其他', inplace=True)
 
         # # 立案信息
         con = pymysql.connect(host=my_host, user=my_user, password=my_password, port=my_port, db=my_db, charset='utf8',
                               use_unicode=True)
-        sql = 'select distinct company from data_platform.`黑名单-新` where state in ("立案","公安立案");'
-        cur = con.cursor()
-        cur.execute(sql)
-        results = cur.fetchall()
-        con.close()
-        LA = []
-        for row in results:
-            LA.append(row[0])
+        sql = 'select distinct company_name company from data_platform.offline_case where offline_case.register_flag ="是";'
+        LA = pd.read_sql(sql, con).company.to_list()
         companylist_all.loc[companylist_all['企业名称'].isin(LA), '立案状态'] = '立案'
         # 将其他没有匹配到的类别填充为‘其他’
         companylist_all['立案状态'].fillna('健康', inplace=True)
+        companylist_all.drop(['总公司'], axis=1, inplace=True)
         # ===========================================================================================================
         return companylist_all

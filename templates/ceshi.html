@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div align="center">
+<h2>User Management</h2>
+    {% if message %} {{message}} {% endif %}
+    <form method="POST">
+        <input type="text" name="input_text" placeholder="username">
+        <input type="submit" value="find">
+        <input type="reset" value="reset">
+    </form>
+    <form method=post>
+        <label for="hehe">输入公司名</label>
+{#        <input type="text" name="input_text" placeholder="username">#}
+        <textarea data-type="text" rows="3" cols="20" name="input_text" id="hehe" placeholder="多家公司用回车键分隔"></textarea>
+        <input type="submit" value="Upload">
+    </form>
+    {% if name %}
+     {
+		{% for movie in movies %}  {# 迭代 movies 变量 #}
+        <li>{{ movie.title }} - {{ movie.year }}</li>  {# 等同于 movie['title'] #}
+        {% endfor %}  {# 使用 endfor 标签结束 for 语句 #}
+     }
+    {% endif %}
+</div>
+
+</body>
+</html>

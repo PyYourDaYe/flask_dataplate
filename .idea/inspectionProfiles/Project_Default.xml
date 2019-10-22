@@ -4,7 +4,7 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="84">
+          <list size="95">
             <item index="0" class="java.lang.String" itemvalue="mysqlclient" />
             <item index="1" class="java.lang.String" itemvalue="traitlets" />
             <item index="2" class="java.lang.String" itemvalue="tzlocal" />
@@ -89,6 +89,17 @@
             <item index="81" class="java.lang.String" itemvalue="Pillow" />
             <item index="82" class="java.lang.String" itemvalue="pyjsparser" />
             <item index="83" class="java.lang.String" itemvalue="Twisted" />
+            <item index="84" class="java.lang.String" itemvalue="jdcal" />
+            <item index="85" class="java.lang.String" itemvalue="pandas" />
+            <item index="86" class="java.lang.String" itemvalue="Werkzeug" />
+            <item index="87" class="java.lang.String" itemvalue="python-dateutil" />
+            <item index="88" class="java.lang.String" itemvalue="Click" />
+            <item index="89" class="java.lang.String" itemvalue="MarkupSafe" />
+            <item index="90" class="java.lang.String" itemvalue="numpy" />
+            <item index="91" class="java.lang.String" itemvalue="Jinja2" />
+            <item index="92" class="java.lang.String" itemvalue="xlrd" />
+            <item index="93" class="java.lang.String" itemvalue="Flask" />
+            <item index="94" class="java.lang.String" itemvalue="openpyxl" />
           </list>
         </value>
       </option>
