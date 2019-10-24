@@ -2,49 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>God bless you</title>
+{#    <title>God bless you</title>#}
+    <title>开发版本</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/Christianity.ico') }}">
     <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='main.css')}}>
 </head>
 <body>
+    <span id="title">
+        {% if name %}
+            <h1>Hello "{{ name }}"!</h1>
+        {% else %}
+{#                <h1>Hello, World!</h1>#}
+            <h1>数据部应用平台</h1>
+        {% endif %}
+    </span>
+
     <div class='left'>
 {#        <img src="{{ url_for('static',filename='images/十字架玫瑰.jpg')}}" alt="cross">#}
-        <span id="title">
-            {% if name %}
-                <h1>Hello "{{ name }}"!</h1>
-            {% else %}
-{#                <h1>Hello, World!</h1>#}
-                <h1>数据部应用平台</h1>
-            {% endif %}
-        </span>
         ------------------------------------------------------------
-        <div class="input_text">
+        <div class="input">
             <p>若只调少量公司的数据，可直接在文本框输入公司名</p>
 {#            <form method=post enctype="text/plain" action="{{ url_for('upload.upload_text')}}">#}
-{#                <label for="hehe">输入公司名</label>#}
-{#                <textarea data-type="text" rows="3" cols="20" name="input_text" id="hehe" placeholder="多家公司用回车键分隔"></textarea>#}
-{#                <input type="submit" value="Upload">#}
-{#            </form>#}
             <form method="post" action="{{ url_for('upload.upload_text')}}">
                 <label for="hehe">输入公司名</label>
-                <textarea data-type="text" rows="3" cols="20" name="input_text" id="hehe" placeholder="多家公司用回车键分隔"></textarea>
+                <textarea data-type="text" rows="3" cols="40" name="input_text" id="hehe" placeholder="多家公司用回车键分隔"></textarea>
                 <input type="submit" value="Upload">
             </form>
         </div>
 {#        <br />#}
-        <div class="input_file">
+        <div class="input">
             <p>上传的文件需满足以下条件之一：<br />
                     要么、公司名单放在第一列；<br />
-                    要么、公司列的字段名为“企业名称”；</p>
+                    &emsp;&emsp;&emsp;&emsp;&emsp;要么、公司列的字段名为“企业名称”；</p>
             <form method=post enctype=multipart/form-data action="{{ url_for('upload.upload_file')}}">
-                <label for="upload">上传文件</label>
+                <label for="upload">上传名单</label>
                 <input type="file" name="file" id="upload" required>
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+        <div class="input">
+            <p>若调取某个地区的数据，请选择对应的行政区划单位，并输入地区名称<br />
+               例：若调取沈阳市的数据，勾选“市”并输入：沈阳<br />
+                &emsp;&emsp;若调取东城区的数据，勾选“区”并输入：东城</p>
+            <form method=post action="{{ url_for('upload.upload_pca')}}">
+                <label>行政区划单位:</label>
+                <input type="radio" name="pca" value='province'/><label>省</label>
+{#                <input name="pca" checked type="radio" value="city"/><label>市</label>#}
+                <input name="pca" type="radio" value="city"/><label>市</label>
+                <input name="pca" type="radio" value="cityarea"/><label>区</label>
+                <br>
+                <label for="pca">输入地区名称</label>
+                <input type="text" name="address_name" id="pca">
                 <input type="submit" value="Upload">
             </form>
         </div>
         ------------------------------------------------------------
         <form method=get action="{{ url_for('download.jibenxinxi')}}">
-            <label for="">&nbsp;调&nbsp;取&nbsp;照&nbsp;面&nbsp;&nbsp;</label>
+            <label for="">调取照面(不走接口)</label>
             <input type="submit" value="download" id="基本信息">
         </form>
         <form method=get action="{{ url_for('download.smokingindex')}}">
@@ -62,9 +76,10 @@
         </section>
     </div>
     <div id="right" class="table-scroll">
+        ------------------------------------------------------------
         <table>
             <tbody>
-                <th>需要调取的公司名单</th>
+                <th>上传的公司名单</th>
                 {% for i in companies %}
                     <tr><td>{{ i }}</td></tr>
                 {% endfor %}

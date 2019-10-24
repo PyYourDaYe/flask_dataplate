@@ -42,11 +42,11 @@ def upload_file():
 
             # session.clear()  #
             # session["companylist"] = companylist
-            # session["filename"] = f.filename
+            session["filename"] = f.filename
 
                   # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))  # 保存上传的文件到服务器
             current_app.config['companylist'] = companylist
-            current_app.config["filename"] = f.filename
+            # current_app.config["filename"] = f.filename
             current_app.config['sheet_ob'] = ws
             return render_template('flask首页.html', companies=companylist)
 
@@ -78,7 +78,7 @@ def upload_text():
         else:
             # flash(str(companylist))
             # return companylist
-            current_app.config.companylist = companies
+            current_app.config['companylist'] = companies
             # session.clear()
             # session["companylist"] = companies
             # session["filename"] = ''
@@ -86,6 +86,30 @@ def upload_text():
             return render_template('flask首页.html', companies=companies)
             # return redirect(url_for('demo_page1'))  # 重定向本地
             # return redirect(url_for('uploaded_file', filename=f.filename)) # 反馈文件
+
+    return render_template('flask首页.html')
+
+
+@upload.route('/upload_pca', methods=['GET', 'POST'])  # 输入省市区 province\city\cityarea
+def upload_pca():
+    if request.method == 'POST':
+        pca = request.values.get('pca')
+        # pca = request.args.get('pca')
+        address = request.form['address_name']
+        if address and pca:
+            address = str(address).strip().replace('\r\n', '')
+            print(pca)
+            print(address)
+            session.clear()
+            session['pca'] = pca
+            session['address'] = address
+            # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            flash(address)  # todo 以其他形式在页面反馈
+            # return render_template('flask首页.html')
+            return redirect(url_for('dataplate_index'))  # 重定向本地
+        else:
+            flash('No text filled or selected')
+            return redirect(url_for('dataplate_index'))
 
     return render_template('flask首页.html')
 

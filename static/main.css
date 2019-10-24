@@ -14,9 +14,9 @@ textarea{
 }
 .left{
     float:left;
-    width:60%;
+    width:50%;
 }
-.input_text{
+.input{
     border-style: solid; border-width: 1px;
     border-color: blue rgb(25%,35%,45%) #909090 red;
 }
@@ -33,15 +33,16 @@ p{
     /*position: absolute;*/
     /*margin-right: -100px;*/
     float:right;
-    width:40%;
+    width:50%;
 }
 .table-scroll table{
     border:1px;
     table-layout: fixed;
-    /*width: auto;*/
+    width: auto;
     background-color:darkseagreen ;
     text-align:center;
     align-self: center;
+    margin:auto;   /*居中*/
 }
 .table-scroll tbody {
     overflow-y: scroll;
@@ -51,7 +52,7 @@ p{
     height: auto;
     max-height: calc(100vh - 100px);
     width: auto;
-    max-width: 350px;
+    /*max-width: 350px;*/
 }
 .table-scroll th{
     /*display: table-row;*/

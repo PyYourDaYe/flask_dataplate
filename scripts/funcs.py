@@ -1,6 +1,8 @@
 import pandas as pd
+import numpy as np
 from manage import mongo_conn
 import pymysql
+import re
 
 my_host = '192.168.1.119'
 my_user = 'data_division'
@@ -70,66 +72,158 @@ class GetCorrespondingFile:
 
     # 取冒烟指数
     @staticmethod
-    def getSmokingindex(companys):
+    def getSmokingindex(obj):
 
         col = mongo_conn.dataplat.financecase
         headers = ['监测企业来源', '监测时间', '排查人', '企业名称', '简称', '官网', '省', '市', '区', '类别', '状态',
                    '收益率（%）', '概述', '传播检索条件', '冒烟指数', '非法性指数', '特征性指数', '利诱性指数',
                    '传播力指数', '投诉率指数']
-
-        company_list = col.aggregate([
-            {'$match': {'name': {'$in': companys}}},
-            # {'$group': {'_id':{'company':'$name','time':'$lastmodifiedtime'},
-            #             'time':
-            #             'count': {'$sum': 1}
-            #             }},
-            # {'$sort': {'count': -1}},
-            {'$project': {
-                '_id': 0,
-                '监测企业来源': '$monitorCompanySource',
-                '监测时间': '$monitorTime',
-                '排查人': '$checkPeople',
-                '企业名称': '$name',
-                '简称': '$shortname',
-                '官网': '$url',
-                '省': '$province',
-                '市': '$city',
-                '区': '$cityarea',
-                '类别': '$classify',
-                '状态': '$state',
-                '收益率（%）': '$rateofreturn',
-                '概述': '$abstract',
-                '传播检索条件': '',
-                '冒烟指数': '$score',
-                '非法性指数': '$indicatorOfIllegal',
-                '特征性指数': '$indicatorOfAdvert',
-                '利诱性指数': '$indicatorOfIncome',
-                '传播力指数': '$indicatorOfInfluence',
-                '投诉率指数': '$indicatorOfComplaint'
-            }}
-        ])
+        if isinstance(obj, list):  # 传的是公司列表的情况
+            company_list = col.aggregate([
+                {'$match': {'name': {'$in': obj}}},
+                # {'$group': {'_id':{'company':'$name','time':'$lastmodifiedtime'},
+                #             'time':
+                #             'count': {'$sum': 1}
+                #             }},
+                # {'$sort': {'count': -1}},
+                {'$project': {
+                    '_id': 0,
+                    '监测企业来源': '$monitorCompanySource',
+                    '监测时间': '$monitorTime',
+                    '排查人': '$checkPeople',
+                    '企业名称': '$name',
+                    '简称': '$shortname',
+                    '官网': '$url',
+                    '省': '$province',
+                    '市': '$city',
+                    '区': '$cityarea',
+                    '类别': '$classify',
+                    '状态': '$state',
+                    '收益率（%）': '$rateofreturn',
+                    '概述': '$abstract',
+                    '传播检索条件': '',
+                    '冒烟指数': '$score',
+                    '非法性指数': '$indicatorOfIllegal',
+                    '特征性指数': '$indicatorOfAdvert',
+                    '利诱性指数': '$indicatorOfIncome',
+                    '传播力指数': '$indicatorOfInfluence',
+                    '投诉率指数': '$indicatorOfComplaint'
+                }}
+            ])
+        elif isinstance(obj, dict):  # 传的是行政区域的情况
+            if 'province' in obj.keys():
+                pattern = re.compile(obj['province'])
+                company_list = col.aggregate([
+                    {'$match': {'province': pattern}},
+                    {'$project': {
+                        '_id': 0,
+                        '监测企业来源': '$monitorCompanySource',
+                        '监测时间': '$monitorTime',
+                        '排查人': '$checkPeople',
+                        '企业名称': '$name',
+                        '简称': '$shortname',
+                        '官网': '$url',
+                        '省': '$province',
+                        '市': '$city',
+                        '区': '$cityarea',
+                        '类别': '$classify',
+                        '状态': '$state',
+                        '收益率（%）': '$rateofreturn',
+                        '概述': '$abstract',
+                        '传播检索条件': '',
+                        '冒烟指数': '$score',
+                        '非法性指数': '$indicatorOfIllegal',
+                        '特征性指数': '$indicatorOfAdvert',
+                        '利诱性指数': '$indicatorOfIncome',
+                        '传播力指数': '$indicatorOfInfluence',
+                        '投诉率指数': '$indicatorOfComplaint'
+                    }}
+                ])
+            elif 'city' in obj.keys():
+                pattern = re.compile(obj['city'])
+                company_list = col.aggregate([
+                    # {'$match': {'province': pattern}},
+                    # {'$match': {'cityarea': pattern}},
+                    {'$match': {'city': pattern}},
+                    {'$project': {
+                        '_id': 0,
+                        '监测企业来源': '$monitorCompanySource',
+                        '监测时间': '$monitorTime',
+                        '排查人': '$checkPeople',
+                        '企业名称': '$name',
+                        '简称': '$shortname',
+                        '官网': '$url',
+                        '省': '$province',
+                        '市': '$city',
+                        '区': '$cityarea',
+                        '类别': '$classify',
+                        '状态': '$state',
+                        '收益率（%）': '$rateofreturn',
+                        '概述': '$abstract',
+                        '传播检索条件': '',
+                        '冒烟指数': '$score',
+                        '非法性指数': '$indicatorOfIllegal',
+                        '特征性指数': '$indicatorOfAdvert',
+                        '利诱性指数': '$indicatorOfIncome',
+                        '传播力指数': '$indicatorOfInfluence',
+                        '投诉率指数': '$indicatorOfComplaint'
+                    }}
+                ])
+            else:
+                pattern = re.compile(obj['cityarea'])
+                company_list = col.aggregate([
+                    {'$match': {'cityarea': pattern}},
+                    {'$project': {
+                        '_id': 0,
+                        '监测企业来源': '$monitorCompanySource',
+                        '监测时间': '$monitorTime',
+                        '排查人': '$checkPeople',
+                        '企业名称': '$name',
+                        '简称': '$shortname',
+                        '官网': '$url',
+                        '省': '$province',
+                        '市': '$city',
+                        '区': '$cityarea',
+                        '类别': '$classify',
+                        '状态': '$state',
+                        '收益率（%）': '$rateofreturn',
+                        '概述': '$abstract',
+                        '传播检索条件': '',
+                        '冒烟指数': '$score',
+                        '非法性指数': '$indicatorOfIllegal',
+                        '特征性指数': '$indicatorOfAdvert',
+                        '利诱性指数': '$indicatorOfIncome',
+                        '传播力指数': '$indicatorOfInfluence',
+                        '投诉率指数': '$indicatorOfComplaint'
+                    }}
+                ])
+        else:
+            return None
 
         list_DF = pd.DataFrame(list(company_list), columns=headers)
-        list_DF['传播检索条件'] = list_DF['简称'].str.cat(list_DF['企业名称'], sep='+')
+        list_DF['传播检索条件'] = np.where(list_DF['简称'] == '', list_DF['企业名称'],
+                                     (list_DF['企业名称'].str.cat(list_DF['简称'], sep='+')))
 
         return list_DF
 
     # 给公司做分类
     @staticmethod
-    def company_sort(sheet):
-        companylist_all = pd.DataFrame(sheet)  #
-        if '企业名称' in companylist_all.iloc[0, :].tolist():
-            companylist_all.columns = companylist_all.loc[0, :]
-            companylist_all.drop(0, inplace=True)
+    def company_sort(obj):
+        if isinstance(obj, list):  # list对象的处理
+            companylist_all = pd.DataFrame(obj, columns=['企业名称'])
         else:
-            companylist_all.rename(columns={0: '企业名称'}, inplace=True)
+            companylist_all = pd.DataFrame(obj)  # sheet对象的处理
+            if '企业名称' in companylist_all.iloc[0, :].tolist():
+                companylist_all.columns = companylist_all.loc[0, :]
+                companylist_all.drop(0, inplace=True)
+            else:
+                companylist_all.rename(columns={0: '企业名称'}, inplace=True)
+        # 清洗中英文括号及换行符
+        companylist_all['企业名称'].replace(['\r\n', '\(', '\)', '\s'], ['', '（', '）', ''], regex=True, inplace=True)
         companylist_all.drop_duplicates(inplace=True)
         companylist_all.reset_index(drop=True, inplace=True)
-        # 清洗中英文括号及换行符
-        companylist_all = companylist_all.replace(['\r\n', '\(', '\)', '\s'], ['', '（', '）', ''], regex=True)
 
-        # 扩充总公司列
-        # 插入列['总公司']，与['企业名称']相同，索引从0开始；
+        # 扩充总公司列， 插入列['总公司']，与['企业名称']相同，索引从0开始；
         companylist_all.insert(1, '总公司', companylist_all['企业名称'])
         # 通过公司名，将包含分公司的部分分开
         companylist_all['总公司'] = companylist_all['总公司'].str.replace('公司', '公司#')
