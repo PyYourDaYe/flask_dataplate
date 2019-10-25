@@ -14,9 +14,9 @@
         {% else %}
 {#                <h1>Hello, World!</h1>#}
             <h1>数据部应用平台</h1>
+            <a href="/" target="_top">回到主页</a>
         {% endif %}
     </span>
-
     <div class='left'>
 {#        <img src="{{ url_for('static',filename='images/十字架玫瑰.jpg')}}" alt="cross">#}
         ------------------------------------------------------------
@@ -54,6 +54,7 @@
                 <label for="pca">输入地区名称</label>
                 <input type="text" name="address_name" id="pca">
                 <input type="submit" value="Upload">
+                <span>{{ address }}</span>   {# todo 修改表现形式 / p节点？#}
             </form>
         </div>
         ------------------------------------------------------------
@@ -64,6 +65,10 @@
         <form method=get action="{{ url_for('download.smokingindex')}}">
             <label for="">调取冒烟指数</label>
             <input type="submit" value="download" id="冒烟指数">
+        </form>
+        <form method=get action="{{ url_for('download.advertisement')}}">
+            <label for="">调取广告数据</label>
+            <input type="submit" value="download" id="广告数据">
         </form>
         <form method=get action="{{ url_for('download.fenlei')}}">
             <label for="">&nbsp;做企业分类&nbsp;&nbsp;</label>

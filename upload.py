@@ -104,9 +104,9 @@ def upload_pca():
             session['pca'] = pca
             session['address'] = address
             # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-            flash(address)  # todo 以其他形式在页面反馈
-            # return render_template('flask首页.html')
-            return redirect(url_for('dataplate_index'))  # 重定向本地
+            # flash(address)  # todo 以其他形式在页面反馈
+            return render_template('flask首页.html', address=address)
+            # return redirect(url_for('dataplate_index'))  # 重定向本地
         else:
             flash('No text filled or selected')
             return redirect(url_for('dataplate_index'))

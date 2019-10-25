@@ -206,6 +206,77 @@ class GetCorrespondingFile:
 
         return list_DF
 
+    # 取广告数据
+    @staticmethod
+    def getAdv(obj):
+        company_col = mongo_conn['advertisement']['companyFinal']
+        adv_col = mongo_conn['advertisement']['final_adv_all']
+
+        def __getADV(mongo_list):
+            df_company = pd.DataFrame(list(mongo_list))
+            ori_list = df_company['company'].tolist()
+            list_length = len(ori_list)
+            print(list_length)
+            iter_size = 1000
+            current = 0
+            df_all_datas = pd.DataFrame()
+            # 根据广告主查广告数据=======
+            while current < list_length:
+                end = current + iter_size
+                recruit_segment = ori_list[current:end]
+                result_cursor = adv_col.find({'e_nameOfAdvertiser': {'$in': recruit_segment}})
+                df_segment = pd.DataFrame(list(result_cursor))
+                df_mix = pd.merge(df_segment, df_company, left_on='e_nameOfAdvertiser', right_on='company')
+                df_mix.drop(['_id', 'company'], axis=1, inplace=True)
+                df_all_datas = df_all_datas.append(df_mix, ignore_index=True)
+                print(end)
+                current = current + iter_size
+
+            return df_all_datas
+
+        if isinstance(obj, list):  # 传的是公司列表的情况
+            list_length = len(obj)
+            print(list_length)
+            iter_size = 1000
+            current = 0
+            df_all_datas = pd.DataFrame()
+            # 根据广告主查广告数据,以1000家为查询批次
+            while current < list_length:
+                end = current + iter_size
+                recruit_segment = obj[current:end]
+                result_cursor = adv_col.find({'e_nameOfAdvertiser': {'$in': recruit_segment}})
+                df_segment = pd.DataFrame(list(result_cursor))
+                df_all_datas = df_all_datas.append(df_segment, ignore_index=True)
+                print(end)
+                current = current + iter_size
+
+            return df_all_datas
+
+        elif isinstance(obj, dict):  # 传的是行政区域的情况
+            if 'province' in obj.keys():
+                mongo_list = company_col.find(
+                    {'address_province': {'$regex': obj['province']}},
+                    {'company': 1, 'registered_address': 1, '_id': 0,
+                     'address_province': 1, 'address_city': 1, 'address_region': 1})
+                list_DF = __getADV(mongo_list)
+                return list_DF
+            elif 'city' in obj.keys():
+                mongo_list = company_col.find(
+                    {'address_city': {'$regex': obj['city']}},
+                    {'company': 1, 'registered_address': 1, '_id': 0,
+                     'address_province': 1, 'address_city': 1, 'address_region': 1})
+                list_DF = __getADV(mongo_list)
+                return list_DF
+            else:
+                mongo_list = company_col.find(
+                    {'address_region': {'$regex': obj['cityarea']}},
+                    {'company': 1, 'registered_address': 1, '_id': 0,
+                     'address_province': 1, 'address_city': 1, 'address_region': 1})
+                list_DF = __getADV(mongo_list)
+                return list_DF
+        else:
+            return None
+
     # 给公司做分类
     @staticmethod
     def company_sort(obj):

@@ -70,3 +70,6 @@ p{
 .flash{
     color: red;
 }
+.input form p {
+    color: red;
+}

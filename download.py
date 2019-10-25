@@ -61,6 +61,34 @@ def smokingindex():
                          mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+@download.route('/advertisement')
+def advertisement():
+    pca = session.pop('pca', None)
+    address = session.pop('address', None)
+    filename = session.pop('filename', None)
+    print(pca, address)
+    # companylist = request.cookies.get('companylist')  # 通过cookie保存名单
+    # filename = request.cookies.get('filename')
+    companylist = current_app.config.pop('companylist', None)
+    # filename = current_app.config.pop("filename", None)
+    if pca and address:
+        pcadict = {pca: address}
+        ad_datas = GetCorrespondingFile.getAdv(pcadict)
+    elif companylist != [''] and companylist is not None:
+        ad_datas = GetCorrespondingFile.getAdv(companylist)
+    else:
+        flash('未传入公司列表')
+        return render_template('flask首页.html')
+    bf = BytesIO()
+    ad_datas.to_excel(bf, index=0, encoding='utf8', engine='xlsxwriter')
+    bf.seek(0)
+    if filename:
+        return send_file(bf, as_attachment=True, attachment_filename='反馈广告数据-%s' % filename,
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        return send_file(bf, as_attachment=True, attachment_filename='反馈广告数据.xlsx',
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
 
 @download.route('/fenlei')
 def fenlei():
