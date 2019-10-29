@@ -2,10 +2,11 @@ from flask import url_for, redirect, render_template, request, flash, \
     send_from_directory, send_file, session, Blueprint, current_app, make_response
 from io import BytesIO
 from openpyxl import load_workbook
-import pandas as pd
+import os
 
 upload = Blueprint('upload', __name__, url_prefix='/upload')
 ALLOWED_EXTENSIONS = set(['xlsx', 'xls'])
+# session: ["pca", "address", "filename", "companies"]
 
 
 def allowed_file(filename):  # 检测文件名
@@ -27,8 +28,6 @@ def upload_file():
             return redirect(url_for('dataplate_index'))
         if f and allowed_file(f.filename):
             wb = load_workbook(filename=BytesIO(f.read()))
-            temp = pd.DataFrame(BytesIO(f.read()))
-            print(temp.head())
             ws = wb.active
             headerlist = [i.value for i in ws[1]]
             print(headerlist)
@@ -40,14 +39,12 @@ def upload_file():
                 companylist = [i.value for i in ws['A']]
             # print(companylist)
 
-            # session.clear()  #
-            # session["companylist"] = companylist
+            session.clear()
             session["filename"] = f.filename
-
-                  # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))  # 保存上传的文件到服务器
-            current_app.config['companylist'] = companylist
-            # current_app.config["filename"] = f.filename
-            current_app.config['sheet_ob'] = ws
+            wb.save(os.path.join(current_app.config['UPLOAD_FOLDER'], f.filename))  # 保存上传的文件到服务器
+            print('将文件"{}"上传到服务器'.format(f.filename))
+            # current_app.config['companylist'] = companylist  # todo
+            # current_app.config['sheet_ob'] = ws  # todo
             return render_template('flask首页.html', companies=companylist)
 
             # resp = make_response(render_template('flask首页.html', companies=companylist))
@@ -55,7 +52,6 @@ def upload_file():
             # resp.set_cookie('filename', f.filename)
             # return resp
 
-            # return redirect(url_for('demo_page1'))  # 重定向本地
             # return redirect(url_for('uploaded_file', filename=f.filename)) # 反馈文件
         else:
             flash('文件格式错误')
@@ -76,12 +72,9 @@ def upload_text():
             flash('No text filled')
             return redirect(url_for('dataplate_index'))
         else:
-            # flash(str(companylist))
-            # return companylist
-            current_app.config['companylist'] = companies
-            # session.clear()
-            # session["companylist"] = companies
-            # session["filename"] = ''
+            session.clear()
+            session["companies"] = companies
+
             # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
             return render_template('flask首页.html', companies=companies)
             # return redirect(url_for('demo_page1'))  # 重定向本地
@@ -94,7 +87,6 @@ def upload_text():
 def upload_pca():
     if request.method == 'POST':
         pca = request.values.get('pca')
-        # pca = request.args.get('pca')
         address = request.form['address_name']
         if address and pca:
             address = str(address).strip().replace('\r\n', '')
