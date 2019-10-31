@@ -15,7 +15,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
 # app.config.companylist = ''
 # app.config.filename = ''
 # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 限制文件大小
-# mongo_conn = MongoClient('192.168.1.110', 17017)
 mongo_conn = MongoClient('192.168.1.110', 17017)
 
 
@@ -66,9 +65,9 @@ def dataplate_index(name=None):
     return render_template('flask首页.html', name=name)
 
 
-from download import download
+from down import download
 app.register_blueprint(download)
-from upload import upload
+from up import upload
 app.register_blueprint(upload)
 
 if __name__ == '__main__':
