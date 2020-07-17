@@ -13,12 +13,13 @@
             <h1>Hello "{{ name }}"!</h1>
         {% else %}
 {#                <h1>Hello, World!</h1>#}
-            <h1>数据部应用平台</h1>
-            <a href="/" target="_top">回到主页</a>
+            <h1>数据运营部应用服务平台</h1>
         {% endif %}
     </span>
+
     <div class='left'>
 {#        <img src="{{ url_for('static',filename='images/十字架玫瑰.jpg')}}" alt="cross">#}
+        <a href="/" >刷新本页</a><br/>
         ------------------------------------------------------------
         <div class="input">
             <p>若只调少量公司的数据，可直接在文本框输入公司名</p>
@@ -74,6 +75,10 @@
             <label for="">&nbsp;做企业分类&nbsp;&nbsp;</label>
             <input type="submit" value="download" id="企业分类">
         </form>
+{#        <form method=get action="{{ url_for('download.SimpleSR')}}">#}
+{#            <label for="">&nbsp;做企业分类&nbsp;&nbsp;</label>#}
+{#            <input type="submit" value="download" id="二级关联">#}
+{#        </form>#}
         <section class="content">
             {% for message in get_flashed_messages() %}
                 <div class="flash">{{ message }}</div>
@@ -81,6 +86,8 @@
         </section>
     </div>
     <div id="right" class="table-scroll">
+
+    <a href="/science" >友情链接：数据科学</a><br/>
         ------------------------------------------------------------
         <table>
             <tbody>

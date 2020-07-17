@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+{#    <title>God bless you</title>#}
+    <title>开发版本</title>
+{#    <link rel="shortcut icon" href="{{ url_for('static', filename='images/Christianity.ico') }}">#}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/十字架玫瑰.jpg') }}">
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='main.css')}}>
+</head>
+<body>
+    <span id="title">
+        {% if name %}
+            <h1>Hello "{{ name }}"!</h1>
+        {% else %}
+{#                <h1>Hello, World!</h1>#}
+            <h1>数据科学部应用服务平台</h1>
+{#            <a href="/" target="_top">友情链接：数据部应用平台</a>#}
+        {% endif %}
+    </span>
+{#    <div id="right" class="table-scroll">#}
+    <div class='left'>
+        <a href="/science" id="left">刷新本页</a><br />
+{#        <img src="{{ url_for('static',filename='images/十字架玫瑰.jpg')}}" alt="cross">#}
+        ------------------------------------------------------------
+{#        <div class="input">#}
+{#            <p>若只调少量公司的数据，可直接在文本框输入公司名</p>#}
+{#            <form method=post enctype="text/plain" action="{{ url_for('upload.upload_text')}}">  enctype不知道咋回事#}
+{#            <form method="post" action="{{ url_for('upload.upload_text')}}">#}
+{#                <label for="hehe">输入公司名</label>#}
+{#                <textarea data-type="text" rows="3" cols="40" name="input_text" id="hehe" placeholder="多家公司用回车键分隔"></textarea>#}
+{#                <input type="submit" value="Upload">#}
+{#            </form>#}
+{#        </div>#}
+        <br />
+        <div class="input">
+    {#            <p>上传的文件需满足以下条件之一：<br />#}
+    {#                    要么、公司名单放在第一列；<br />#}
+    {#                    &emsp;&emsp;&emsp;&emsp;&emsp;要么、公司列的字段名为“企业名称”；</p>#}
+            <form method=post enctype=multipart/form-data action="{{ url_for('upload.upload_file2')}}">
+                <label for="upload">上传文件</label>
+                <input type="file" name="file" id="upload" required>
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+{#        <div class="input">#}
+{#            <p>若调取某个地区的冒烟分数或广告数据，请选择对应的行政区划单位，并输入地区名称<br />#}
+{#               例：若调取沈阳市的数据，勾选“市”并输入：沈阳<br />#}
+{#                &emsp;&emsp;若调取东城区的数据，勾选“区”并输入：东城</p>#}
+{#            <form method=post action="{{ url_for('upload.upload_pca')}}">#}
+{#                <label>行政区划单位:</label>#}
+{#                <input type="radio" name="pca" value='province'/><label>省</label>#}
+{#                <input name="pca" checked type="radio" value="city"/><label>市</label>#}
+{#                <input name="pca" type="radio" value="city"/><label>市</label>#}
+{#                <input name="pca" type="radio" value="cityarea"/><label>区</label>#}
+{#                <br>#}
+{#                <label for="pca">输入地区名称</label>#}
+{#                <input type="text" name="address_name" id="pca">#}
+{#                <input type="submit" value="Upload">#}
+{#                <span>{{ address }}</span>
+{#            </form>#}
+{#        </div>#}
+        ------------------------------------------------------------
+{#        <form method=get action="{{ url_for('download.jibenxinxi')}}">#}
+{#            <label for="">调取照面(不走接口)</label>#}
+{#            <input type="submit" value="download" id="基本信息">#}
+{#        </form>#}
+{#        <form method=get action="{{ url_for('download.smokingindex')}}">#}
+{#            <label for="">调取冒烟指数</label>#}
+{#            <input type="submit" value="download" id="冒烟指数">#}
+{#        </form>#}
+{#        <form method=get action="{{ url_for('download.advertisement')}}">#}
+{#            <label for="">调取广告数据</label>#}
+{#            <input type="submit" value="download" id="广告数据">#}
+{#        </form>#}
+{#        <form method=get action="{{ url_for('download.fenlei')}}">#}
+{#            <label for="">&nbsp;做企业分类&nbsp;&nbsp;</label>#}
+{#            <input type="submit" value="download" id="企业分类">#}
+{#        </form>#}
+    <div class="input">
+        <form method=get action="{{ url_for('download.simpleSR')}}">
+            <label for="">&nbsp;二级关联&nbsp;&nbsp;</label>
+            <input type="submit" value="download" id="二级关联">
+            <p>只需节点表和关系表</p>
+        </form>
+    </div>
+    <div class="input">
+        <form method=get action="{{ url_for('download.finalSR')}}">
+            <label for="">二级关联(多表扩充)</label>
+            <input type="submit" value="download" id="二级关联(多表扩充)">
+            <p>还需照面、高管等表</p>
+        </form>
+    </div>
+        <section class="content">
+            {% for message in get_flashed_messages() %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        </section>
+    </div>
+    <div id="right" class="table-scroll">
+        <a href="/" id="right">友情链接：数据运营</a><br />
+        ------------------------------------------------------------
+        <table>
+            <tbody>
+                <th>上传的文件名</th>
+                <tr><td>{{ dict.file_name }}</td></tr>
+                <th>sheet list</th>
+                {% for i in dict.sheets %}
+                    <tr><td>{{ i }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

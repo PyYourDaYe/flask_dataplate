@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from manage import mongo_conn
+from settings import mongo_conn
 import pymysql
 import re
 

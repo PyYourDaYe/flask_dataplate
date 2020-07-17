@@ -1,7 +1,9 @@
 from flask import url_for, redirect, render_template, flash, \
     send_from_directory, send_file, session, Blueprint, request, current_app
 from io import BytesIO
-from scripts.funcs import GetCorrespondingFile
+from scripts.Operations_funcs import GetCorrespondingFile
+from scripts.DataScience_funcs import SimpleSR, FinalSR
+
 from openpyxl import load_workbook
 import os
 
@@ -13,8 +15,8 @@ with app.app_context():
 
 
 def get_companylist(ws):
-    headerlist = [i.value for i in ws[1]]
-    print(headerlist)
+    headerlist = [i.value for i in ws[1]]  # 获取表头
+
     if '企业名称' in headerlist:
         indx = headerlist.index('企业名称') + 1  # 列的下标:从1开始
         rowcount = ws.max_row
@@ -206,3 +208,55 @@ def fenlei():
     else:
         flash('未传入公司列表')
         return render_template('flask首页.html')
+
+
+@download.route('/simpleSR')
+def simpleSR():
+
+    filename = session.pop('filename', None)
+
+    if filename != '' and filename is not None:
+        file_path = os.path.join(root_path, filename)
+        try:
+            temp = SimpleSR(file_path)
+            bf = temp.to_gephi()
+            # a, b = temp.to_gephi()
+            # bf = BytesIO()
+            # a.to_excel(bf, sheet_name='节点', index=0)
+            # b.to_excel(bf, sheet_name='关系', index=0)
+            # bf.seek(0)
+            return send_file(bf, as_attachment=True, attachment_filename='反馈-二级关联.xlsx',
+                             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            # return send_from_directory(dirpath, fp_test_files, as_attachment=True)
+        finally:
+            os.remove(file_path)
+
+    else:
+        flash('未传入公司列表')
+        return render_template('数据科学.html')
+
+
+@download.route('/finalSR')
+def finalSR():
+
+    filename = session.pop('filename', None)
+
+    if filename != '' and filename is not None:
+        file_path = os.path.join(root_path, filename)
+        try:
+            temp = FinalSR(file_path)
+            bf = temp.to_gephi()
+            # a, b = temp.to_gephi()
+            # bf = BytesIO()
+            # a.to_excel(bf, sheet_name='节点', index=0)
+            # b.to_excel(bf, sheet_name='关系', index=0)
+            # bf.seek(0)
+            return send_file(bf, as_attachment=True, attachment_filename='反馈-二级关联.xlsx',
+                             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            # return send_from_directory(dirpath, fp_test_files, as_attachment=True)
+        finally:
+            os.remove(file_path)
+
+    else:
+        flash('未传入公司列表')
+        return render_template('数据科学.html')

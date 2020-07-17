@@ -7,6 +7,8 @@ import os
 upload = Blueprint('upload', __name__, url_prefix='/upload')
 ALLOWED_EXTENSIONS = set(['xlsx', 'xls'])
 # session: ["pca", "address", "filename", "companies"]
+# if not os.path.exists(current_app.app_context):
+#     os.mkdir(current_app.config['UPLOAD_FOLDER'])
 
 
 def allowed_file(filename):  # 检测文件名
@@ -30,7 +32,7 @@ def upload_file():
             wb = load_workbook(filename=BytesIO(f.read()))
             ws = wb.active
             headerlist = [i.value for i in ws[1]]
-            print(headerlist)
+            # print(headerlist)
             if '企业名称' in headerlist:
                 indx = headerlist.index('企业名称')+1  # 列的下标
                 rowcount = ws.max_row
@@ -109,3 +111,42 @@ def upload_pca():
 @upload.route('/uploads/<filename>')  # 文件上传成功后的反馈
 def uploaded_file(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+
+
+@upload.route('/upload_file2', methods=['GET', 'POST'])  # 上传文件,针对二级关联
+def upload_file2():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(url_for('data_science_index'))
+        f = request.files['file']
+        # if user does not select file,browser also submit an empty part without filename
+        if f.filename == '':
+            flash('No selected file')
+            return redirect(url_for('data_science_index'))
+        if f and allowed_file(f.filename):
+            file_info = dict()
+            wb = load_workbook(filename=BytesIO(f.read()))
+            sheetNameList = wb.sheetnames
+            file_info['sheets'] = sheetNameList
+            file_info['file_name'] = f.filename
+
+            session.clear()
+            session["filename"] = f.filename
+            wb.save(os.path.join(current_app.config['UPLOAD_FOLDER'], f.filename))  # 保存上传的文件到服务器
+            print('将文件"{}"上传到服务器'.format(f.filename))
+            # current_app.config['companylist'] = companylist
+            # current_app.config['sheet_ob'] = ws
+            return render_template('数据科学.html', dict=file_info)
+
+            # resp = make_response(render_template('flask首页.html', companies=companylist))
+            # resp.set_cookie('companylist', str(companylist))
+            # resp.set_cookie('filename', f.filename)
+            # return resp
+
+            # return redirect(url_for('uploaded_file', filename=f.filename)) # 反馈文件
+        else:
+            flash('文件格式错误')
+            return redirect(url_for('data_science_index'))
+
+    return render_template('数据科学.html')
